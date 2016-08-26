@@ -1,24 +1,49 @@
-# To get started with security, check out the documentation:
-# http://symfony.com/doc/current/book/security.html
 security:
+    encoders:
+        AppBundle\Entity\Usat:
+            algorithm: plaintext
 
-    # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
     providers:
-        in_memory:
-            memory: ~
+        chain_provider:
+            chain:
+                providers: [usat_provider]
+        usat_provider:
+            entity:
+                class: AppBundle:Usat
 
     firewalls:
-        # disables authentication for assets and the profiler, adapt it according to your needs
+#        dev_exception:
+#            pattern: ^/
+#            security: false
+
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
+        api_doc:
+            pattern: ^/doc
+            security: false
+
+        login:
+            pattern:  ^/login
+            stateless: true
+            anonymous: true
+            form_login:
+                check_path:               /login_check
+                success_handler:          lexik_jwt_authentication.handler.authentication_success
+                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+                require_previous_session: false
+
         main:
-            anonymous: ~
-            # activate different ways to authenticate
+            pattern:   ^/
+            stateless: true
+            lexik_jwt:
+              throw_exceptions: true
 
-            # http_basic: ~
-            # http://symfony.com/doc/current/book/security.html#a-configuring-how-your-users-will-authenticate
+    access_control:
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 
-            # form_login: ~
-            # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]

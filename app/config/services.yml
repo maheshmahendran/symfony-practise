@@ -1,9 +1,16 @@
-# Learn more about services, parameters and containers at
-# http://symfony.com/doc/current/book/service_container.html
 parameters:
-#    parameter_name: value
 
 services:
-#    service_name:
-#        class: AppBundle\Directory\ClassName
-#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+    app.api_exception.subscriber:
+        class: AppBundle\EventListener\ApiExceptionSubscriber
+        arguments:
+            - "%kernel.debug%"
+        tags:
+            - { name: kernel.event_subscriber }
+
+    api.event.jwt_created_listener:
+        class: AppBundle\EventListener\JWTCreatedListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: onJWTCreated }
+        arguments:
+            - "@doctrine.orm.entity_manager"
