@@ -46,3 +46,15 @@
 
 # Backup entities generated with doctrine:generate:entities command
 */Entity/*~
+
+#Doctrine backups
+*.php~
+
+#NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
